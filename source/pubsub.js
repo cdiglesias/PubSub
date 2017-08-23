@@ -80,13 +80,16 @@
       if (channels[currentChannel])
         for (i = 0, l = channels[currentChannel].length; i < l; i += 1) {
           subscription = channels[currentChannel][i];
-          prevent = subscription.callback.apply(subscription.context, args);
-          if (debug) {
-            receiver = subscription.context.options || subscription.context;
-            log('receiver:' + receiver.id + ' channel:' + currentChannel, args);
-          }
-          if (prevent === false && type === 'ordered') {
-            return prevent;
+
+          if (subscription !== undefined) {
+            prevent = subscription.callback.apply(subscription.context, args);
+            if (debug) {
+              receiver = subscription.context.options || subscription.context;
+              log('receiver:' + receiver.id + ' channel:' + currentChannel, args);
+            }
+            if (prevent === false && type === 'ordered') {
+              return prevent;
+            }
           }
         }
     }
@@ -161,7 +164,7 @@
           delete fn.priority;
         }
         channels[channel] = channels[channel] || [];
-        channels[channel].push({context: cntx, callback: fn, priority: priority, token: token});
+        channels[channel].push({ context: cntx, callback: fn, priority: priority, token: token });
         channels[channel] = sortByKey(channels[channel], 'priority');
         log('subscribe to channel:' + channel, arguments);
         //post sticky messages
